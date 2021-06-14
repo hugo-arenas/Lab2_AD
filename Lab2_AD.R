@@ -7,6 +7,8 @@ library(cluster)
 library(fpc)
 library(NbClust)
 library(factoextra)
+library(FactoMineR)
+library(Rtsne) 
 
 library(ez)
 library(dplyr)
@@ -110,3 +112,47 @@ print(fviz_cluster(clusters2, data = tabla, star.plot = TRUE))
 
 # Comparando ambos clusters, la mejor opción es el obtenido por la distancia de
 # "manhattan", dado que este tiene menos datos mezclados entre sus grupos.
+
+
+gower.dist <- daisy(tabla, metric = c("gower"))
+print(fviz_nbclust(gower.dist))
+gower.matrix = as.matrix(gower.dist)
+tabla[
+  which(gower.matrix == min(gower.matrix[gower.matrix != min(gower.matrix)]),
+        arr.ind = TRUE)[1, ], ]
+
+# Calculate silhouette width for many k using PAM
+
+sil_width <- c(NA)
+
+for(i in 2:10){
+  
+  pam_fit <- pam(gower.dist,
+                 diss = TRUE,
+                 k = i)
+  
+  sil_width[i] <- pam_fit$silinfo$avg.width
+  
+}
+
+# Plot sihouette width (higher is better)
+
+plot(1:10, sil_width,
+     xlab = "Number of clusters",
+     ylab = "Silhouette Width")
+lines(1:10, sil_width)
+
+pam_fit <- pam(gower.dist, diss = TRUE, k = 2)
+
+tsne_obj <- Rtsne(gower.dist, is_distance = TRUE)
+
+tsne_data <- tsne_obj$Y %>%
+  data.frame() %>%
+  setNames(c("X", "Y")) %>%
+  mutate(cluster = factor(pam_fit$clustering),
+         name = tabla$class)
+
+ggplot(aes(x = X, y = Y), data = tsne_data) +
+  geom_point(aes(color = cluster))
+#clusters3 <- pam(gower.dist, k = 2, diss = TRUE)
+#print(fviz_cluster(clusters3, data = tabla, star.plot = TRUE))
