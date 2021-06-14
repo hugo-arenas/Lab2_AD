@@ -77,9 +77,36 @@ tabla <- scale(tabla)
 
 summary(tabla)
 
-#Se hacen los clusters
-posibles.clusters <- NbClust(tabla, distance = "euclidean", min.nc=2, max.nc=10, method="median",index="alllong")
-fviz_nbclust(posibles.clusters)
+# Se realizan estimaciones por "el método del codo".
+print(fviz_nbclust(tabla, kmeans, method = "wss"))
 
-clusters <- pam(tabla, k = 2)
-fviz_cluster(clusters, data = tabla)
+# Se realizan estimaciones por "el método de la silueta".
+print(fviz_nbclust(tabla, kmeans, method = "silhouette"))
+
+# Se realizan estimaciones por "el método de la brecha estadística".
+print(fviz_nbclust(tabla, kmeans, method = "gap_stat"))
+
+# Tanto el método del codo y el método de la brecha estadística indican que el
+# mejor candidato con 3 clusters, sin embargo, el método de la silueta sugiere que
+# el mejor candidato con 2 clusters-
+
+# Comprobando el mejor número de clusters por la distancia "euclidean" y el método
+# "kmeans", entregando todos los índices posibles y ver la mejor opción.
+posibles.clusters1 <- NbClust(tabla, distance = "euclidean", min.nc=2, max.nc=10, method="kmeans",index="alllong")
+print(fviz_nbclust(posibles.clusters1))
+
+# El mejor candidato es de 2 clusters, por tanto, se imprimen sus gráficos.
+clusters1 <- pam(tabla, k = 2, metric = "euclidean")
+print(fviz_cluster(clusters1, data = tabla, star.plot = TRUE))
+
+# Comprobando el mejor número de clusters por la distancia "manhattan" y el método
+# "kmeans", entregando todos los índices posibles y ver la mejor opción.
+posibles.clusters2 <- NbClust(tabla, distance = "manhattan", min.nc=2, max.nc=10, method="kmeans",index="alllong")
+print(fviz_nbclust(posibles.clusters2))
+
+# El mejor candidato es de 2 clusters, por tanto, se imprimen sus gráficos.
+clusters2 <- pam(tabla, k = 2, metric = "manhattan")
+print(fviz_cluster(clusters2, data = tabla, star.plot = TRUE))
+
+# Comparando ambos clusters, la mejor opción es el obtenido por la distancia de
+# "manhattan", dado que este tiene menos datos mezclados entre sus grupos.
