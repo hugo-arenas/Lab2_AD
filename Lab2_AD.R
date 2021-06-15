@@ -157,3 +157,5 @@ tabla$clusters <- clusters2$clustering
 print(summary(tabla[tabla["clusters"] == 1, ]))
 print(summary(tabla[tabla["clusters"] == 2, ]))
 print(summary(tabla["clusters"]))
+
+#medoid.clusters <- clusters1$medoids * ttr(d$s.x, 'scaled:scale') + attr(d$s.x, 'scaled:center')
