@@ -68,11 +68,11 @@ tabla$irradiat <- unclass(as.factor(tabla$irradiat))
 summary(tabla)
 
 #Se sacan los datos nulos del datagrama
-bool.values <- tabla$node.caps=='1'
-tabla <- tabla[!bool.values,]
+#bool.values <- tabla$node.caps=='1'
+#tabla <- tabla[!bool.values,]
 
-bool.values <- tabla$breast.quad =='1'
-tabla <- tabla[!bool.values,]
+#bool.values <- tabla$breast.quad =='1'
+#tabla <- tabla[!bool.values,]
 
 #Se pone a escala.
 tabla <- scale(tabla)
@@ -101,6 +101,10 @@ print(fviz_nbclust(posibles.clusters1))
 clusters1 <- pam(tabla, k = 2, metric = "euclidean")
 print(fviz_cluster(clusters1, data = tabla, star.plot = TRUE))
 
+dist.eucl = dist(tabla, method = "euclidean")
+print(dist.eucl)
+fviz_dist(dist.eucl)
+
 # Comprobando el mejor número de clusters por la distancia "manhattan" y el método
 # "kmeans", entregando todos los índices posibles y ver la mejor opción.
 posibles.clusters2 <- NbClust(tabla, distance = "manhattan", min.nc=2, max.nc=10, method="kmeans",index="alllong")
@@ -113,46 +117,30 @@ print(fviz_cluster(clusters2, data = tabla, star.plot = TRUE))
 # Comparando ambos clusters, la mejor opción es el obtenido por la distancia de
 # "manhattan", dado que este tiene menos datos mezclados entre sus grupos.
 
+dist.manh = dist(tabla, method = "manhattan")
+print(dist.manh)
+fviz_dist(dist.manh)
 
-gower.dist <- daisy(tabla, metric = c("gower"))
-print(fviz_nbclust(gower.dist))
-gower.matrix = as.matrix(gower.dist)
-tabla[
-  which(gower.matrix == min(gower.matrix[gower.matrix != min(gower.matrix)]),
-        arr.ind = TRUE)[1, ], ]
+gower.dist <- daisy(tabla, metric = "gower", stand = FALSE)
+print(gower.dist)
+fviz_dist(gower.dist)
 
-# Calculate silhouette width for many k using PAM
+gower.matrix <- as.matrix(gower.dist)
 
 sil_width <- c(NA)
-
-for(i in 2:10){
-  
-  pam_fit <- pam(gower.dist,
-                 diss = TRUE,
-                 k = i)
-  
-  sil_width[i] <- pam_fit$silinfo$avg.width
-  
+for(i in 2:21){  
+ pam_fit <- pam(gower.dist, diss = TRUE, k = i)  
+  sil_width[i] <- pam_fit$silinfo$avg.width  
 }
-
-# Plot sihouette width (higher is better)
-
-plot(1:10, sil_width,
+plot(1:21, sil_width,
      xlab = "Number of clusters",
      ylab = "Silhouette Width")
-lines(1:10, sil_width)
+lines(1:21, sil_width)
 
-pam_fit <- pam(gower.dist, diss = TRUE, k = 2)
+#Se trabjará con 2 cluster, ya que se sabe que son 2 varolres en clases (comestible y venenoso)
+#Entonces se quiere ver, cuantos valores pertenecen a cada grupo (cluster)
+k<-2
 
-tsne_obj <- Rtsne(gower.dist, is_distance = TRUE)
 
-tsne_data <- tsne_obj$Y %>%
-  data.frame() %>%
-  setNames(c("X", "Y")) %>%
-  mutate(cluster = factor(pam_fit$clustering),
-         name = tabla$class)
 
-ggplot(aes(x = X, y = Y), data = tsne_data) +
-  geom_point(aes(color = cluster))
-#clusters3 <- pam(gower.dist, k = 2, diss = TRUE)
-#print(fviz_cluster(clusters3, data = tabla, star.plot = TRUE))
+
