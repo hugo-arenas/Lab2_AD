@@ -75,18 +75,18 @@ summary(tabla)
 #tabla <- tabla[!bool.values,]
 
 #Se pone a escala.
-tabla <- scale(tabla)
+tabla.scaled <- scale(tabla)
 
-summary(tabla)
+summary(tabla.scaled)
 
 # Se realizan estimaciones por "el método del codo".
-print(fviz_nbclust(tabla, kmeans, method = "wss"))
+print(fviz_nbclust(tabla.scaled, kmeans, method = "wss"))
 
 # Se realizan estimaciones por "el método de la silueta".
-print(fviz_nbclust(tabla, kmeans, method = "silhouette"))
+print(fviz_nbclust(tabla.scaled, kmeans, method = "silhouette"))
 
 # Se realizan estimaciones por "el método de la brecha estadística".
-print(fviz_nbclust(tabla, kmeans, method = "gap_stat"))
+print(fviz_nbclust(tabla.scaled, kmeans, method = "gap_stat"))
 
 # Tanto el método del codo y el método de la brecha estadística indican que el
 # mejor candidato con 3 clusters, sin embargo, el método de la silueta sugiere que
@@ -94,36 +94,45 @@ print(fviz_nbclust(tabla, kmeans, method = "gap_stat"))
 
 # Comprobando el mejor número de clusters por la distancia "euclidean" y el método
 # "kmeans", entregando todos los índices posibles y ver la mejor opción.
-posibles.clusters1 <- NbClust(tabla, distance = "euclidean", min.nc=2, max.nc=10, method="kmeans",index="alllong")
+posibles.clusters1 <- NbClust(tabla.scaled, distance = "euclidean", min.nc=2, max.nc=10, method="kmeans",index="alllong")
 print(fviz_nbclust(posibles.clusters1))
 
 # El mejor candidato es de 2 clusters, por tanto, se imprimen sus gráficos.
-clusters1 <- pam(tabla, k = 2, metric = "euclidean")
-print(fviz_cluster(clusters1, data = tabla, star.plot = TRUE))
+clusters1 <- pam(tabla.scaled, k = 2, metric = "euclidean")
+print(fviz_cluster(clusters1, data = tabla.scaled, star.plot = TRUE))
 
-dist.eucl = dist(tabla, method = "euclidean")
+dist.eucl = dist(tabla.scaled, method = "euclidean")
 print(dist.eucl)
 fviz_dist(dist.eucl)
 
 # Comprobando el mejor número de clusters por la distancia "manhattan" y el método
 # "kmeans", entregando todos los índices posibles y ver la mejor opción.
-posibles.clusters2 <- NbClust(tabla, distance = "manhattan", min.nc=2, max.nc=10, method="kmeans",index="alllong")
+posibles.clusters2 <- NbClust(tabla.scaled, distance = "manhattan", min.nc=2, max.nc=10, method="kmeans",index="alllong")
 print(fviz_nbclust(posibles.clusters2))
 
 # El mejor candidato es de 2 clusters, por tanto, se imprimen sus gráficos.
-clusters2 <- pam(tabla, k = 2, metric = "manhattan")
-print(fviz_cluster(clusters2, data = tabla, star.plot = TRUE))
+clusters2 <- pam(tabla.scaled, k = 2, metric = "manhattan")
+print(fviz_cluster(clusters2, data = tabla.scaled, star.plot = TRUE))
 
 # Comparando ambos clusters, la mejor opción es el obtenido por la distancia de
 # "manhattan", dado que este tiene menos datos mezclados entre sus grupos.
 
-dist.manh = dist(tabla, method = "manhattan")
-print(dist.manh)
-fviz_dist(dist.manh)
+#-------------------------------------------------------------------------------
 
-gower.dist <- daisy(tabla, metric = "gower", stand = FALSE)
+cluster.daisy <- daisy(tabla.scaled, metric = "gower")
+cluster.daisy.matrix <- as.matrix(cluster.daisy)
+clusters3 <- kmeans(cluster.daisy.matrix, 2)
+print(fviz_cluster(clusters3, data = tabla.scaled, star.plot = TRUE))
+
+#-------------------------------------------------------------------------------
+
+dist.manh = dist(tabla.scaled, method = "manhattan")
+print(dist.manh)
+print(fviz_dist(dist.manh))
+
+gower.dist <- daisy(tabla.scaled, metric = "gower", stand = FALSE)
 print(gower.dist)
-fviz_dist(gower.dist)
+print(fviz_dist(gower.dist))
 
 gower.matrix <- as.matrix(gower.dist)
 
@@ -132,15 +141,19 @@ for(i in 2:21){
  pam_fit <- pam(gower.dist, diss = TRUE, k = i)  
   sil_width[i] <- pam_fit$silinfo$avg.width  
 }
-plot(1:21, sil_width,
+print(plot(1:21, sil_width,
      xlab = "Number of clusters",
-     ylab = "Silhouette Width")
+     ylab = "Silhouette Width"))
 lines(1:21, sil_width)
 
-#Se trabjará con 2 cluster, ya que se sabe que son 2 varolres en clases (comestible y venenoso)
+#Se trabjará con 2 cluster, ya que se sabe que son 2 valores en clases (comestible y venenoso)
 #Entonces se quiere ver, cuantos valores pertenecen a cada grupo (cluster)
 k<-2
 
 
+#-------------------------------------------------------------------------------
 
-
+tabla$clusters <- clusters2$clustering
+print(summary(tabla[tabla["clusters"] == 1, ]))
+print(summary(tabla[tabla["clusters"] == 2, ]))
+print(summary(tabla["clusters"]))
