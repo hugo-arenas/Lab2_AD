@@ -68,10 +68,10 @@ tabla$irradiat <- unclass(as.factor(tabla$irradiat))
 summary(tabla)
 
 #Se sacan los datos nulos del datagrama
-bool.values <- tabla$node.caps=='?'
+bool.values <- tabla$node.caps=='1'
 tabla <- tabla[!bool.values,]
 
-bool.values <- tabla$breast.quad =='?'
+bool.values <- tabla$breast.quad =='1'
 tabla <- tabla[!bool.values,]
 
 #Se pone a escala.
