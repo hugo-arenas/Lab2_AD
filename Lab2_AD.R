@@ -194,6 +194,6 @@ med.irradiat <- clusters2$medoids[,10] * attr(tabla.scaled, 'scaled:scale')[10] 
 med.tabla <- data.frame(med.class, med.age, med.menopause, med.tumor.size,
                         med.inv.nodes, med.node.caps, med.deg.malig, med.breast,
                         med.breast.quad, med.irradiat)
-
+print(med.tabla)
 
 
