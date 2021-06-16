@@ -64,19 +64,34 @@ tabla$breast <- unclass(as.factor(tabla$breast))
 tabla$breast.quad <- unclass(as.factor(tabla$breast.quad)) 
 tabla$irradiat <- unclass(as.factor(tabla$irradiat))
 
+
 #Realizamos analisis de componentes multiple
 res.mca <- MCA(tabla, graph = TRUE)
+
+#Para visualizar la proporción de variaciones retenidas por las diferentes dimensiones.
+eig.val <- get_eigenvalue(res.mca)
+
+#Para visualizar los porcentajes de inercia explicados por cada dimensión de MCA
+fviz_screeplot(res.mca, addlabels = TRUE, ylim = c(0, 45))+ggtitle("Analisis MCA")
+
+#Se muestran las variables con mas contribucion para el estudio
+
+#Dimension 1
+fviz_contrib(res.mca, choice = "var", axes = 1, top = 37)+ggtitle("Contribución de variables en Dimension 1")
+#Dimension 2
+fviz_contrib(res.mca, choice = "var", axes = 2, top = 37)+ggtitle("Contribución de variables en Dimension 2")
+
 #Lo primero es ver el rango de las variables, algunas medidas
 #de tendencia central para las variables continuas, recuentos 
 #para las categóricas y presencia de valores faltantes.
 summary(tabla)
 
 #Se sacan los datos nulos del datagrama
-bool.values <- tabla$node.caps=='1'
-tabla <- tabla[!bool.values,]
+#bool.values <- tabla$node.caps=='1'
+#tabla <- tabla[!bool.values,]
 
-bool.values <- tabla$breast.quad =='1'
-tabla <- tabla[!bool.values,]
+#bool.values <- tabla$breast.quad =='1'
+#tabla <- tabla[!bool.values,]
 
 #Se pone a escala.
 tabla.scaled <- scale(tabla)
