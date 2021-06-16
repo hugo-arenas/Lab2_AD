@@ -51,6 +51,8 @@ columns <- c("class",
              "irradiat")
 
 tabla <- read.csv(file, col.names = columns)
+
+
 tabla$class <- unclass(as.factor(tabla$class))
 tabla$age <- unclass(as.factor(tabla$age)) 
 tabla$menopause <- unclass(as.factor(tabla$menopause)) 
@@ -62,17 +64,19 @@ tabla$breast <- unclass(as.factor(tabla$breast))
 tabla$breast.quad <- unclass(as.factor(tabla$breast.quad)) 
 tabla$irradiat <- unclass(as.factor(tabla$irradiat))
 
+#Realizamos analisis de componentes multiple
+res.mca <- MCA(tabla, graph = TRUE)
 #Lo primero es ver el rango de las variables, algunas medidas
 #de tendencia central para las variables continuas, recuentos 
 #para las categóricas y presencia de valores faltantes.
 summary(tabla)
 
 #Se sacan los datos nulos del datagrama
-#bool.values <- tabla$node.caps=='1'
-#tabla <- tabla[!bool.values,]
+bool.values <- tabla$node.caps=='1'
+tabla <- tabla[!bool.values,]
 
-#bool.values <- tabla$breast.quad =='1'
-#tabla <- tabla[!bool.values,]
+bool.values <- tabla$breast.quad =='1'
+tabla <- tabla[!bool.values,]
 
 #Se pone a escala.
 tabla.scaled <- scale(tabla)
@@ -159,3 +163,6 @@ print(summary(tabla[tabla["clusters"] == 2, ]))
 print(summary(tabla["clusters"]))
 
 #medoid.clusters <- clusters1$medoids * ttr(d$s.x, 'scaled:scale') + attr(d$s.x, 'scaled:center')
+
+
+
