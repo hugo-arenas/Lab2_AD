@@ -193,30 +193,12 @@ k<-2
 
 #-------------------------------------------------------------------------------
 
-tabla$clusters <- clusters2$clustering
+tabla$clusters <- clusters3$cluster
 print(summary(tabla[tabla["clusters"] == 1, ]))
 print(summary(tabla[tabla["clusters"] == 2, ]))
 print(summary(tabla["clusters"]))
 
 # Se obtienen los medioides reales respecto a cada variable por cluster.
-med.class <- clusters2$medoids[,1] * attr(tabla.scaled, 'scaled:scale')[1] + attr(tabla.scaled, 'scaled:center')[1]
-med.age <- clusters2$medoids[,2] * attr(tabla.scaled, 'scaled:scale')[2] + attr(tabla.scaled, 'scaled:center')[2]
-med.menopause <- clusters2$medoids[,3] * attr(tabla.scaled, 'scaled:scale')[3] + attr(tabla.scaled, 'scaled:center')[3]
-med.tumor.size <- clusters2$medoids[,4] * attr(tabla.scaled, 'scaled:scale')[4] + attr(tabla.scaled, 'scaled:center')[4]
-med.inv.nodes <- clusters2$medoids[,5] * attr(tabla.scaled, 'scaled:scale')[5] + attr(tabla.scaled, 'scaled:center')[5]
-med.node.caps <- clusters2$medoids[,6] * attr(tabla.scaled, 'scaled:scale')[6] + attr(tabla.scaled, 'scaled:center')[6]
-med.deg.malig <- clusters2$medoids[,7] * attr(tabla.scaled, 'scaled:scale')[7] + attr(tabla.scaled, 'scaled:center')[7]
-med.breast <- clusters2$medoids[,8] * attr(tabla.scaled, 'scaled:scale')[8] + attr(tabla.scaled, 'scaled:center')[8]
-med.breast.quad <- clusters2$medoids[,9] * attr(tabla.scaled, 'scaled:scale')[9] + attr(tabla.scaled, 'scaled:center')[9]
-med.irradiat <- clusters2$medoids[,10] * attr(tabla.scaled, 'scaled:scale')[10] + attr(tabla.scaled, 'scaled:center')[10]
-
-# Se crea una tabla que muestra los medioides de cada variables según los grupos
-# de cluster por "manhattan".
-med.tabla <- data.frame(med.class, med.age, med.menopause, med.tumor.size,
-                        med.inv.nodes, med.node.caps, med.deg.malig, med.breast,
-                        med.breast.quad, med.irradiat)
-print(med.tabla)
-
 # Se crea una tabla que muestra los medioides de cada variables según los grupos
 # de cluster por "gower".
 pam_results <- tabla %>%
@@ -225,4 +207,16 @@ pam_results <- tabla %>%
   do(the_summary = summary(.))
 
 med.gower <- tabla[pam_fit$medoids,]
-print(med.gower)
+med.gower <- select(med.gower, -clusters)
+medoids.1 <- med.gower[1,1]
+medoids.2 <- med.gower[2,1]
+cont <- 2
+while (length(medoids.1)<10){
+  medoids.1 <- c(medoids.1, med.gower[1,cont])
+  medoids.2 <- c(medoids.2, med.gower[2,cont])
+  cont <- cont + 1
+}
+
+# Se genera la tabla de medioides.
+g.medoids <- data.frame(variables = columns,medoids.1, medoids.2)
+print(g.medoids)
