@@ -99,13 +99,20 @@ tabla.scaled <- scale(tabla)
 summary(tabla.scaled)
 
 # Se realizan estimaciones por "el método del codo".
-print(fviz_nbclust(tabla.scaled, kmeans, method = "wss"))
+print(fviz_nbclust(tabla.scaled, kmeans, method = "wss")+
+        labs(title = "Método del codo"))
 
 # Se realizan estimaciones por "el método de la silueta".
-print(fviz_nbclust(tabla.scaled, kmeans, method = "silhouette"))
+print(fviz_nbclust(tabla.scaled, kmeans, method = "silhouette")+
+        labs(title = "Método de la Silueta"))
 
 # Se realizan estimaciones por "el método de la brecha estadística".
-print(fviz_nbclust(tabla.scaled, kmeans, method = "gap_stat"))
+print(fviz_nbclust(tabla.scaled, kmeans, method = "gap_stat")+
+        labs(title = "Método de la brecha estadística"))
+
+# Se realizan estimaciones por "el método de la brecha estadística".
+print(fviz_nbclust(tabla.scaled, kmeans, method = "gap_stat")+
+        labs(title = "Método de la brecha estadística"))
 
 # Tanto el método del codo y el método de la brecha estadística indican que el
 # mejor candidato con 3 clusters, sin embargo, el método de la silueta sugiere que
@@ -114,20 +121,26 @@ print(fviz_nbclust(tabla.scaled, kmeans, method = "gap_stat"))
 # Comprobando el mejor número de clusters por la distancia "euclidean" y el método
 # "kmeans", entregando todos los índices posibles y ver la mejor opción.
 posibles.clusters1 <- NbClust(tabla.scaled, distance = "euclidean", min.nc=2, max.nc=10, method="kmeans",index="alllong")
-print(fviz_nbclust(posibles.clusters1))
+print(fviz_nbclust(posibles.clusters1) +
+        labs(title = "K óptimo con distancia Euclediana"))
 
 # El mejor candidato es de 2 clusters, por tanto, se imprimen sus gráficos.
 clusters1 <- pam(tabla.scaled, k = 2, metric = "euclidean")
-print(fviz_cluster(clusters1, data = tabla.scaled, star.plot = TRUE))
+print(fviz_cluster(clusters1, data = tabla.scaled, 
+                   ellipse.type = "norm",ggtheme = theme_minimal())+
+        labs(title = "Agrupamiento en 2 Clústers con distancia Euclideana"))
 
 # Comprobando el mejor número de clusters por la distancia "manhattan" y el método
 # "kmeans", entregando todos los índices posibles y ver la mejor opción.
 posibles.clusters2 <- NbClust(tabla.scaled, distance = "manhattan", min.nc=2, max.nc=10, method="kmeans",index="alllong")
-print(fviz_nbclust(posibles.clusters2))
+print(fviz_nbclust(posibles.clusters2)+
+        labs(title = "K óptimo con distancia Manhattan")+
+        labs(title = "Agrupamiento en 2 Clústers con distancia Manhattan"))
 
 # El mejor candidato es de 2 clusters, por tanto, se imprimen sus gráficos.
 clusters2 <- pam(tabla.scaled, k = 2, metric = "manhattan")
-print(fviz_cluster(clusters2, data = tabla.scaled, star.plot = TRUE))
+print(fviz_cluster(clusters2, data = tabla.scaled, 
+                   ellipse.type = "norm",ggtheme = theme_minimal()))
 
 # Comparando ambos clusters, la mejor opción es el obtenido por la distancia de
 # "manhattan", dado que este tiene menos datos mezclados entre sus grupos.
@@ -139,7 +152,9 @@ cluster.daisy.matrix <- as.matrix(cluster.daisy)
 clusters3 <- kmeans(cluster.daisy.matrix, 2)
 pam_fit <- pam(cluster.daisy, diss = TRUE, k = 2)
 
-print(fviz_cluster(clusters3, data = tabla.scaled, star.plot = TRUE))
+print(fviz_cluster(clusters3, data = tabla.scaled,
+                   ellipse.type = "norm",ggtheme = theme_minimal())+
+        labs(title = "Agrupamiento en 2 Clústers con distancia Gower"))
 
 # Comparando los 3 clusters, la mejor opción es el obtenido por la distancia de
 # "gower", dado que este tiene menos datos mezclados entre sus grupos. El 
@@ -162,14 +177,14 @@ print(fviz_dist(gower.dist))
 gower.matrix <- as.matrix(gower.dist)
 
 sil_width <- c(NA)
-for(i in 2:21){  
+for(i in 2:10){  
  pam_fit <- pam(gower.dist, diss = TRUE, k = i)  
   sil_width[i] <- pam_fit$silinfo$avg.width  
 }
-print(plot(1:21, sil_width,
+print(plot(1:10, sil_width,
      xlab = "Number of clusters",
      ylab = "Silhouette Width"))
-lines(1:21, sil_width)
+lines(1:10, sil_width)
 
 #Se trabjará con 2 cluster, ya que se sabe que son 2 valores en clases (comestible y venenoso)
 #Entonces se quiere ver, cuantos valores pertenecen a cada grupo (cluster)
