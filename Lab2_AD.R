@@ -134,13 +134,13 @@ print(fviz_cluster(clusters1, data = tabla.scaled,
 # "kmeans", entregando todos los índices posibles y ver la mejor opción.
 posibles.clusters2 <- NbClust(tabla.scaled, distance = "manhattan", min.nc=2, max.nc=10, method="kmeans",index="alllong")
 print(fviz_nbclust(posibles.clusters2)+
-        labs(title = "K óptimo con distancia Manhattan")+
-        labs(title = "Agrupamiento en 2 Clústers con distancia Manhattan"))
+        labs(title = "K óptimo con distancia Manhattan"))
 
 # El mejor candidato es de 2 clusters, por tanto, se imprimen sus gráficos.
 clusters2 <- pam(tabla.scaled, k = 2, metric = "manhattan")
 print(fviz_cluster(clusters2, data = tabla.scaled, 
-                   ellipse.type = "norm",ggtheme = theme_minimal()))
+                   ellipse.type = "norm",ggtheme = theme_minimal())+
+        labs(title = "Agrupamiento en 2 Clústers con distancia Manhattan"))
 
 # Comparando ambos clusters, la mejor opción es el obtenido por la distancia de
 # "manhattan", dado que este tiene menos datos mezclados entre sus grupos.
