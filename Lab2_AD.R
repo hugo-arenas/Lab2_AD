@@ -120,10 +120,6 @@ print(fviz_nbclust(posibles.clusters1))
 clusters1 <- pam(tabla.scaled, k = 2, metric = "euclidean")
 print(fviz_cluster(clusters1, data = tabla.scaled, star.plot = TRUE))
 
-dist.eucl = dist(tabla.scaled, method = "euclidean")
-print(dist.eucl)
-fviz_dist(dist.eucl)
-
 # Comprobando el mejor número de clusters por la distancia "manhattan" y el método
 # "kmeans", entregando todos los índices posibles y ver la mejor opción.
 posibles.clusters2 <- NbClust(tabla.scaled, distance = "manhattan", min.nc=2, max.nc=10, method="kmeans",index="alllong")
@@ -136,14 +132,24 @@ print(fviz_cluster(clusters2, data = tabla.scaled, star.plot = TRUE))
 # Comparando ambos clusters, la mejor opción es el obtenido por la distancia de
 # "manhattan", dado que este tiene menos datos mezclados entre sus grupos.
 
-#-------------------------------------------------------------------------------
-
+# Comprobando el mejor número de clusters por la distancia "gower" y el método
+# "kmeans", entregando todos los índices posibles y ver la mejor opción.
 cluster.daisy <- daisy(tabla.scaled, metric = "gower")
 cluster.daisy.matrix <- as.matrix(cluster.daisy)
 clusters3 <- kmeans(cluster.daisy.matrix, 2)
+pam_fit <- pam(cluster.daisy, diss = TRUE, k = 2)
+
 print(fviz_cluster(clusters3, data = tabla.scaled, star.plot = TRUE))
 
+# Comparando los 3 clusters, la mejor opción es el obtenido por la distancia de
+# "gower", dado que este tiene menos datos mezclados entre sus grupos. El 
+# segundo mejor cluster el el obtenido por la distancia manhattan.
+
 #-------------------------------------------------------------------------------
+
+dist.eucl = dist(tabla.scaled, method = "euclidean")
+print(dist.eucl)
+fviz_dist(dist.eucl)
 
 dist.manh = dist(tabla.scaled, method = "manhattan")
 print(dist.manh)
@@ -190,10 +196,18 @@ med.breast.quad <- clusters2$medoids[,9] * attr(tabla.scaled, 'scaled:scale')[9]
 med.irradiat <- clusters2$medoids[,10] * attr(tabla.scaled, 'scaled:scale')[10] + attr(tabla.scaled, 'scaled:center')[10]
 
 # Se crea una tabla que muestra los medioides de cada variables según los grupos
-# de cluster
+# de cluster por "manhattan".
 med.tabla <- data.frame(med.class, med.age, med.menopause, med.tumor.size,
                         med.inv.nodes, med.node.caps, med.deg.malig, med.breast,
                         med.breast.quad, med.irradiat)
 print(med.tabla)
 
+# Se crea una tabla que muestra los medioides de cada variables según los grupos
+# de cluster por "gower".
+pam_results <- tabla %>%
+  mutate(cluster = pam_fit$clustering) %>%
+  group_by(cluster) %>%
+  do(the_summary = summary(.))
 
+med.gower <- tabla[pam_fit$medoids,]
+print(med.gower)
