@@ -217,6 +217,32 @@ while (length(medoids.1)<10){
   cont <- cont + 1
 }
 
+medoids.1[1] <- "no-recurrence-events"
+medoids.2[1] <- "no-recurrence-events"
+
+medoids.1[2] <- "40-39"
+medoids.2[2] <- "40-39"
+
+medoids.1[3] <- "ge40"
+medoids.2[3] <- "ge40"
+
+medoids.1[4] <- "25-29"
+medoids.2[4] <- "20-24"
+
+medoids.1[5] <- "0-2"
+medoids.2[5] <- "0-2"
+
+medoids.1[6] <- "no"
+medoids.2[6] <- "no"
+
+medoids.1[8] <- "right"
+medoids.2[8] <- "left"
+
+medoids.1[9] <- "left_up"
+medoids.2[9] <- "left_low"
+
+medoids.1[10] <- "no"
+medoids.2[10] <- "no"
 # Se genera la tabla de medioides.
 g.medoids <- data.frame(variables = columns,medoids.1, medoids.2)
 print(g.medoids)
